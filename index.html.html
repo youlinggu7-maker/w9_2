@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>國小數學速率單元互動教材 — 國立清華大學數理教育研究所 古宥羚</title>
+<style>
+  :root{
+    --bg:#f0f4f8;
+    --card:#ffffff;
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --accent:#0ea5e9;
+    --success:#16a34a;
+    --warning:#eab308;
+    --danger:#dc2626;
+    --muted:#64748b;
+    --border:#cbd5e1;
+    --shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+    --radius:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+    background:var(--bg);color:#1e293b;line-height:1.6;
+  }
+  a{color:var(--primary);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ---------- Header ---------- */
+  header{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+    color:#fff;padding:24px 20px;text-align:center;box-shadow:var(--shadow);
+  }
+  header h1{font-size:1.5rem;font-weight:800;letter-spacing:0.5px}
+  header .sub{font-size:0.95rem;opacity:0.95;margin-top:6px;font-weight:400}
+  header .badge{
+    display:inline-block;margin-top:10px;padding:6px 14px;border:1px solid rgba(255,255,255,0.4);
+    border-radius:20px;background:rgba(255,255,255,0.1);font-size:0.85rem;
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex;background:#fff;border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:50;box-shadow:var(--shadow);
+  }
+  .tab{
+    flex:1;padding:14px 8px;cursor:pointer;border-bottom:3px solid transparent;
+    font-weight:700;font-size:0.92rem;color:#475569;transition:all .2s;
+    text-align:center;background:#f8fafc;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;border-right:1px solid var(--border);
+  }
+  .tab:last-child{border-right:none}
+  .tab:hover{background:#e2e8f0;color:var(--primary)}
+  .tab.active{background:var(--card);color:var(--primary);border-bottom-color:var(--primary);box-shadow:inset 0 -3px 0 var(--primary)}
+
+  /* ---------- Pages ---------- */
+  .page{display:none;padding:24px 20px;max-width:1100px;margin:0 auto;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .page.active{display:block}
+  .page h2{font-size:1.5rem;color:var(--primary-dark);margin-bottom:10px;border-left:5px solid var(--primary);
+             padding-left:12px}
+  .page h3{font-size:1.15rem;color:#1e293b;margin:20px 0 10px}
+  .page p{margin-bottom:12px}
+  .intro{background:#e0f2fe;border:1px solid #bae6fd;border-radius:var(--radius);padding:16px 20px;margin-bottom:20px}
+
+  /* ---------- Cards ---------- */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+         padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .card h4{color:var(--primary-dark);margin-bottom:8px;font-size:1.05rem}
+
+  /* ---------- Concept box ---------- */
+  .concept{background:#fbfdff;border:2px dashed var(--accent);border-radius:var(--radius);
+            padding:20px;text-align:center;margin:18px 0}
+  .concept .big{font-size:2.2rem;font-weight:900;color:var(--primary)}
+  .concept small{display:block;color:var(--muted);margin-top:6px}
+
+  /* ---------- Triangle ---------- */
+  .triangle-wrap{display:flex;justify-content:center;margin:20px 0}
+  .triangle{
+    width:0;height:0;border-left:90px solid transparent;border-right:90px solid transparent;
+    border-bottom:150px solid var(--primary);position:relative;border-radius:12px 12px 0 0;
+  }
+  .triangle::after{
+    content:"";position:absolute;top:-10px;left:-100px;width:200px;height:200px;
+    border-radius:50%;border:3px solid var(--primary);box-sizing:border-box;
+  }
+  .tri-label{position:absolute;color:#fff;font-weight:800;font-size:1.05rem;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
+  .tri-dist{top:20px;left:50%;transform:translateX(-50%)}
+  .tri-time{top:105px;left:14px;font-size:0.95rem}
+  .tri-rate{top:105px;right:14px;font-size:0.95rem}
+
+  .formula{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+  .formula .btn{
+    background:#fff;border:1px solid var(--border);color:#1e293b;padding:8px 14px;
+    border-radius:8px;font-weight:700;cursor:pointer;transition:.2s
+  }
+  .formula .btn:hover{background:#f1f5f9;border-color:var(--primary);color:var(--primary)}
+
+  /* ---------- Misconception ---------- */
+  .myth{background:#fef2f2;border-left:5px solid var(--danger);padding:16px 20px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0}
+  .myth .tag{display:inline-block;background:var(--danger);color:#fff;font-size:0.78rem;
+             font-weight:800;padding:3px 10px;border-radius:10px;margin-bottom:8px;text-transform:uppercase}
+  .myth h5{color:#991b1b;margin-bottom:6px}
+  .truth{background:#f0fdf4;border-left:5px solid var(--success);padding:16px 20px;margin:14px 0;border-radius:0 var(--radius) var(--radius) 0}
+  .truth .tag{display:inline-block;background:var(--success);color:#fff;font-size:0.78rem;
+             font-weight:800;padding:3px 10px;border-radius:10px;margin-bottom:8px;text-transform:uppercase}
+  .truth h5{color:#14532d;margin-bottom:6px}
+
+  /* ---------- Difficulty ---------- */
+  .diff{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}
+  .diff .chip{
+    flex:1;padding:14px 12px;border-radius:10px;color:#fff;font-weight:800;text-align:center;
+    cursor:pointer;transition:.2s;border:1px solid rgba(255,255,255,0.3)
+  }
+  .diff .chip.low{background:#ef4444}
+  .diff .chip.mid{background:#f59e0b}
+  .diff .chip.high{background:#2563eb}
+  .diff .chip:hover{opacity:.9;transform:translateY(-2px)}
+  .diff .chip.active{outline:3px solid #fff;box-shadow:0 0 0 3px var(--muted)}
+  .diff-content{display:none;padding:20px;background:#fff;border:1px solid var(--border);
+                 border-radius:var(--radius);margin-top:10px;box-shadow:var(--shadow)}
+  .diff-content.show{display:block}
+  .diff-content h5{color:var(--primary-dark);margin-bottom:10px}
+
+  /* ---------- Practice question ---------- */
+  .q{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:14px 0}
+  .q .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .q .qnum{background:var(--primary);color:#fff;font-weight:900;width:26px;height:26px;border-radius:50%;
+           display:inline-flex;align-items:center;justify-content:center;font-size:0.9rem}
+  .q .qlabel{font-weight:800;color:#1e293b}
+  .q p{margin-bottom:8px}
+  .options{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .opt{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);
+    border-radius:8px;background:#fff;cursor:pointer;transition:.2s
+  }
+  .opt input{accent-color:var(--primary)}
+  .opt:hover{border-color:var(--primary);background:#f1f5f9}
+  .opt.selected{border-color:var(--success);background:#f0fdf4}
+  .opt.correct{border-color:var(--success);background:#f0fdf4}
+  .opt.wrong{border-color:var(--danger);background:#fef2f2}
+  .feedback{margin-top:8px;padding:10px 14px;border-radius:8px;display:none;font-weight:700}
+  .feedback.ok{background:#f0fdf4;color:#14532d;border:1px solid #bbf7d0}
+  .feedback.bad{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+
+  /* ---------- Buttons & copy ---------- */
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+  .btn{
+    padding:10px 18px;border-radius:8px;border:none;font-weight:700;cursor:pointer;transition:.2s;font-size:0.95rem
+  }
+  .btn.primary{background:var(--primary);color:#fff}
+  .btn.primary:hover{background:var(--primary-dark)}
+  .btn.outline{background:#fff;border:1px solid var(--border);color:#1e293b}
+  .btn.outline:hover{border-color:var(--primary);color:var(--primary)}
+  .btn.copy{
+    background:#fff;border:1px solid var(--border);color:#374151;padding:6px 12px;
+    border-radius:6px;font-size:0.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px
+  }
+  .btn.copy:hover{background:#f1f5f9;border-color:var(--primary);color:var(--primary)}
+  .copied{color:var(--success)!important}
+
+  /* ---------- Mock screenshots (no external images) ---------- */
+  .mock{background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+         padding:16px;margin:16px 0;box-shadow:var(--shadow);overflow:auto}
+  .mock .winbar{
+    display:flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:8px 8px 0 0;
+    background:#e2e8f0;margin:-16px -16px 12px -16px
+  }
+  .mock .dot{width:10px;height:10px;border-radius:50%}
+  .mock .dot.r{background:#ff5f56}.mock .dot.y{background:#ffbd2e}.mock .dot.g{background:#27c93f}
+  .mock .titlebar{font-size:0.85rem;font-weight:700;color:#64748b;margin-left:10px}
+  .mock .note{font-size:0.8rem;color:var(--muted);background:#fffbeb;border:1px solid #fde68a;
+              border-radius:6px;padding:8px 12px;margin-bottom:12px}
+  .mock pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto;
+             font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:0.85rem;margin:0}
+  .mock img{display:none} /* ensure no external image loading */
+
+  .tag-soft{display:inline-block;background:#e0e7ff;color:#3730a3;font-size:0.78rem;
+            font-weight:800;padding:3px 10px;border-radius:10px;margin-right:6px}
+  .source{font-size:0.8rem;color:var(--muted);border-top:1px solid var(--border);margin-top:14px;padding-top:10px}
+
+  /* ---------- Footer ---------- */
+  footer{background:#fff;border-top:1px solid var(--border);padding:24px 20px;text-align:center;
+         color:var(--muted);font-size:0.85rem;margin-top:30px}
+  footer .line{margin:4px 0}
+
+  /* mobile */
+  @media(max-width:640px){
+    .tab{font-size:0.78rem;padding:10px 4px}
+    .page{padding:16px 12px}
+    .triangle{width:0;height:0;border-left:60px solid transparent;border-right:60px solid transparent;border-bottom:100px solid var(--primary)}
+    .tri-dist{top:14px;font-size:0.9rem}
+    .tri-time,.tri-rate{top:70px;font-size:0.8rem}
+    .tri-time{left:8px}.tri-rate{right:8px}
+    .diff{flex-direction:column}
+    .formula{flex-direction:column;align-items:center}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>國小數學「速率」單元互動教材</h1>
+  <div class="sub">差異化教學 · 時間、距離與速率的關係 · 平均速率迷思解構 · OpenCode 本地模型使用</div>
+  <div class="badge">製作單位：國立清華大學數理教育研究所 古宥羚</div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="單元切換">
+  <div class="tab active" data-tab="home" role="tab">🏠 首頁</div>
+  <div class="tab" data-tab="unit1" role="tab">單元一：速率是什麼？</div>
+  <div class="tab" data-tab="unit2" role="tab">單元二：時間・距離・速率</div>
+  <div class="tab" data-tab="unit3" role="tab">單元三：平均速率與迷思</div>
+  <div class="tab" data-tab="unit4" role="tab">單元四：差異化練習</div>
+  <div class="tab" data-tab="unit5" role="tab">單元五：OpenCode 本地模型</div>
+  <div class="tab" data-tab="prompt" role="tab">📄 製作這個教材的 Prompt</div>
+  <div class="tab" data-tab="faq" role="tab">❓ 常見問答（GLM / LM Studio）</div>
+</nav>
+
+<!-- ================= HOME ================= -->
+<section id="page-home" class="page active" aria-labelledby="h-home">
+  <h2 id="h-home">歡迎使用速率單元互動教材</h2>
+  <div class="intro">
+    <strong>對象：</strong>國小學生（低成就學生、一般生、高成就學生皆適用）<br>
+    <strong>目標：</strong>理解「速率」的核心概念，掌握時間、距離與速率的關係，並正確計算平均速率，避免常見迷思。<br>
+    <strong>特色：</strong>全頁籤切換、離線可用、圖片全內嵌（無外部網址）、內建「一鍵複製」按鈕。
+  </div>
+
+  <div class="card">
+    <h4>🎯 本單元學習目標</h4>
+    <ul style="margin:10px 0 0 22px;list-style-disc">
+      <li>能用自己話說出什麼是「速率」（單位時間內的距離）。</li>
+      <li>會使用「速率＝距離÷時間」與其變形公式。</li>
+      <li>了解平均速率＝總距離÷總時間，並能說明為什麼不能簡單「將兩段速率相加除以 2」。</li>
+      <li>能辨識並正確解決上山下山、流水（順流／逆流）等應用題。</li>
+      <li>根據自己的程度（低／中／高）選擇適合的練習題。</li>
+      <li>知道如何在 OpenCode 與本地模型（Gemma 4 26B、Qwen 3 / 您機器上的 qwen3.8-27b）對話學習。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>🗺️ 如何使用本教材</h4>
+    <div class="row">
+      <div class="btn outline" style="flex:1">👉 點選上方頁籤切換單元</div>
+      <div class="btn outline" style="flex:1">📋 按「複製」可把範例貼到 OpenCode</div>
+      <div class="btn outline" style="flex:1">💾 離開後可將本 HTML 檔另存，離線也能開啟</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>👨‍🏫 製作單位與聲明</h4>
+    <p>本教材由 <strong>國立清華大學數理教育研究所 古宥羚</strong> 製作，供國小數學「速率」單元教學使用。</p>
+    <p class="source">資料來源：OpenCode 本機模型登錄（opencode.models() 查詢結果）。圖片皆為本檔內嵌的 CSS 繪製，未引用任何外部圖片網址，可完全離線使用。</p>
+  </div>
+</section>
+
+<!-- ================= UNIT 1 ================= -->
+<section id="page-unit1" class="page" aria-labelledby="h-u1">
+  <h2 id="h-u1">單元一：速率是什麼？</h2>
+  <div class="intro">速率告訴我們「一單位時間內走過多遠的距離」。這是理解所有速率應用題的基礎。</div>
+
+  <div class="card">
+    <h4>📌 核心概念</h4>
+    <div class="concept">
+      <div class="big">速率 ＝ 距離 ÷ 時間</div>
+      <small>例如：小明 1 小時走了 60 公里，速率＝60÷1＝60 公里/小時（km/h）</small>
+    </div>
+    <p>生活中的速率單位很多種，國小常見的有：</p>
+    <div class="row">
+      <div class="btn outline" style="flex:1">公里/小時 (km/h)</div>
+      <div class="btn outline" style="flex:1">公尺/秒 (m/s)</div>
+      <div class="btn outline" style="flex:1">公尺/分鐘 (m/min)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>🔢 舉例：計算速率</h4>
+    <div class="q">
+      <div class="qhead"><span class="qnum">1</span><span class="qlabel">例題</span></div>
+      <p>小華騎車 2 小時騎了 30 公里，請問他的速率是多少？</p>
+      <div class="options">
+        <label class="opt"><input type="radio" name="u1q1" value="a"> 15 公里/小時</label>
+        <label class="opt"><input type="radio" name="u1q1" value="b"> 30 公里/小時</label>
+        <label class="opt"><input type="radio" name="u1q1" value="c"> 60 公里/小時</label>
+      </div>
+      <div class="feedback ok" id="u1q1-ok">正確！30÷2＝15 公里/小時。</div>
+      <div class="feedback bad" id="u1q1-bad">再想一想：30 公里 ÷ 2 小時 ＝ 每小時多少公里？</div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="check('u1q1','b','u1q1-ok','u1q1-bad')">檢查答案</button>
+        <button class="btn copy" onclick="copyText('速率 ＝ 距離 ÷ 時間 ＝ 30 公里 ÷ 2 小時 ＝ 15 公里/小時')">📋 複製公式</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>💡 給不同程度同學的建議</h4>
+    <div class="diff">
+      <div class="chip low" onclick="setDiff('d1','low')">低成就：先看圖、算簡單整數</div>
+      <div class="chip mid" onclick="setDiff('d1','mid')">一般生：練習換算單位</div>
+      <div class="chip high" onclick="setDiff('d1','high')">高成就：嘗試分數或小數時間</div>
+    </div>
+    <div id="d1" class="diff-content">
+      <h5>🎯 分層內容</h5>
+      <ul style="margin-left:22px">
+        <li><strong>低成就：</strong>用圖畫表示「1 小時走幾公里」，從整數開始，老師先示範一題。</li>
+        <li><strong>一般生：</strong>練習「公里↔公尺」、「小時↔分鐘」單位換算後再求速率。</li>
+        <li><strong>高成就：</strong>挑戰時間為分數（例如 1.5 小時）或小數的速率計算。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="source">單元一內容皆為本教材原創，圖片以 CSS 繪製，無外部資源。</div>
+</section>
+
+<!-- ================= UNIT 2 ================= -->
+<section id="page-unit2" class="page" aria-labelledby="h-u2">
+  <h2 id="h-u2">單元二：時間、距離、速率的關係</h2>
+  <div class="intro">三個量互為關聯，知道任意兩個，就能算出第三個。</div>
+
+  <div class="card">
+    <h4>🔺 速率三角形（記憶法）</h4>
+    <div class="triangle-wrap">
+      <div class="triangle">
+        <div class="tri-label tri-dist">距離</div>
+        <div class="tri-label tri-time">時間</div>
+        <div class="tri-label tri-rate">速率</div>
+      </div>
+    </div>
+    <div class="formula">
+      <button class="btn" onclick="showFormula('d')">距離 ＝ 速率 × 時間</button>
+      <button class="btn" onclick="showFormula('t')">時間 ＝ 距離 ÷ 速率</button>
+      <button class="btn" onclick="showFormula('r')">速率 ＝ 距離 ÷ 時間</button>
+    </div>
+    <div id="formula-msg" style="text-align:center;margin-top:10px;font-weight:700;color:var(--primary)"></div>
+  </div>
+
+  <div class="card">
+    <h4>📐 公式變形練習</h4>
+    <div class="q">
+      <div class="qhead"><span class="qnum">2</span><span class="qlabel">例題</span></div>
+      <p>小美以每小時 50 公里的速率開車，開了 3 小時，一共開了多少公里？</p>
+      <div class="options">
+        <label class="opt"><input type="radio" name="u2q1" value="a"> 150 公里</label>
+        <label class="opt"><input type="radio" name="u2q1" value="b"> 53 公里</label>
+        <label class="opt"><input type="radio" name="u2q1" value="c"> 16.7 公里</label>
+      </div>
+      <div class="feedback ok" id="u2q1-ok">正確！距離 ＝ 速率 × 時間 ＝ 50 × 3 ＝ 150 公里。</div>
+      <div class="feedback bad" id="u2q1-bad">提示：這題要用「距離 ＝ 速率 × 時間」。</div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="check('u2q1','a','u2q1-ok','u2q1-bad')">檢查答案</button>
+        <button class="btn copy" onclick="copyText('距離 ＝ 速率 × 時間 ＝ 50 公里/小時 × 3 小時 ＝ 150 公里')">📋 複製算式</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>⏱️ 單位換算小提醒</h4>
+    <ul style="margin-left:22px">
+      <li>1 小時 ＝ 60 分鐘 ＝ 3600 秒</li>
+      <li>1 公里 ＝ 1000 公尺</li>
+      <li>算速率前，先確認時間與距離單位是否匹配。</li>
+    </ul>
+  </div>
+
+  <div class="diff" style="margin-top:10px">
+    <div class="chip low" onclick="setDiff('d2','low')">低成就：整數時間、整數速率</div>
+    <div class="chip mid" onclick="setDiff('d2','mid')">一般生：含單位換算的應用題</div>
+    <div class="chip high" onclick="setDiff('d2','high')">高成就：多段行程、未知量方程式</div>
+  </div>
+  <div id="d2" class="diff-content">
+    <h5>🎯 分層內容</h5>
+    <ul style="margin-left:22px">
+      <li><strong>低成就：</strong>老師先圈出「速率」與「時間」，再相乘求距離。</li>
+      <li><strong>一般生：</strong>練習「小時→分鐘」或「公里→公尺」換算後計算。</li>
+      <li><strong>高成就：</strong>設計多段行程（例：先走 1 小時，再走 2 小時，速率不同，求總距離）。</li>
+    </ul>
+  </div>
+
+  <div class="source">單元二圖表以 CSS 純手工繪製，無外部圖片網址，離線即可完整顯示。</div>
+</section>
+
+<!-- ================= UNIT 3 ================= -->
+<section id="page-unit3" class="page" aria-labelledby="h-u3">
+  <h2 id="h-u3">單元三：平均速率與常見迷思</h2>
+  <div class="intro">這是速率單元最容易出錯的地方！我們來拆解「平均速率」的真正含義。</div>
+
+  <div class="card">
+    <h4>✅ 正確定義</h4>
+    <div class="concept">
+      <div class="big">平均速率 ＝ 總距離 ÷ 總時間</div>
+      <small>注意：不是「兩段速率的平均」</small>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>❌ 經典迷思：上山下山問題</h4>
+    <div class="myth">
+      <div class="tag">迷思</div>
+      <h5>「上山 40 公里/小時，下山 60 公里/小時，平均速率就是 (40＋60)÷2 ＝ 50 公里/小時」？</h5>
+      <p>❌ 錯誤！上山與下山所花的「時間」不一樣，不能簡單平均。</p>
+    </div>
+    <div class="truth">
+      <div class="tag">正確解法</div>
+      <h5>設上山與下山的距離都等於 D 公里</h5>
+      <ul style="margin-left:22px">
+        <li>上山時間 ＝ D ÷ 40 小時</li>
+        <li>下山時間 ＝ D ÷ 60 小時</li>
+        <li>總距離 ＝ 2D；總時間 ＝ D÷40 ＋ D÷60 ＝ (3D＋2D)÷120 ＝ 5D÷120 ＝ D÷24 小時</li>
+        <li><strong>平均速率 ＝ 總距離 ÷ 總時間 ＝ 2D ÷ (D÷24) ＝ 48 公里/小時</strong></li>
+      </ul>
+      <p>答案是 <strong>48 公里/小時</strong>，不是 50！</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>🌊 經典迷思：流水問題（順流／逆流）</h4>
+    <div class="myth">
+      <div class="tag">迷思</div>
+      <h5>「順流速率 ＋ 逆流速率 ＝ 靜水速率 × 2」？</h5>
+      <p>這式子本身沒錯，但新手常把「水流速率」直接當成船的速率，搞混誰加誰減。</p>
+    </div>
+    <div class="truth">
+      <div class="tag">公式</div>
+      <ul style="margin-left:22px">
+        <li><strong>順流速率 ＝ 船在靜水中的速率 ＋ 水流速率</strong></li>
+        <li><strong>逆流速率 ＝ 船在靜水中的速率 － 水流速率</strong></li>
+        <li>靜水速率 ＝ (順流 ＋ 逆流) ÷ 2；水流速率 ＝ (順流 － 逆流) ÷ 2</li>
+      </ul>
+      <p class="source">提醒：順流「加」水流、逆流「減」水流，方向決定加減。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>🧠 為什麼會錯？迷思拆解</h4>
+    <ul style="margin-left:22px">
+      <li><strong>忽略時間權重：</strong>平均速率是以「時間」為權重，花較長時間的路段影響較大。</li>
+      <li><strong>混淆「距離相等」與「時間相等」：</strong>上山下山距離相等，但上山較慢、花更多時間。</li>
+      <li><strong>把公式死背：</strong>不理解為什麼，遇到稍微不同的情境就會亂用。</li>
+    </ul>
+  </div>
+
+  <div class="diff" style="margin-top:10px">
+    <div class="chip low" onclick="setDiff('d3','low')">低成就：先算出總距離與總時間，再相除</div>
+    <div class="chip mid" onclick="setDiff('d3','mid')">一般生：練習上山下山與流水標準題</div>
+    <div class="chip high" onclick="setDiff('d3','high')">高成就：證明「平均速率 ＝ 兩速率算術平均」在距離相等時不成立</div>
+  </div>
+  <div id="d3" class="diff-content">
+    <h5>🎯 分層內容</h5>
+    <ul style="margin-left:22px">
+      <li><strong>低成就：</strong>老師引導先填「總距離」與「總時間」兩欄，最後相除。</li>
+      <li><strong>一般生：</strong>獨立完成上山下山、順流逆流標準應用題。</li>
+      <li><strong>高成就：</strong>嘗試用代數證明，或設計一個「平均速率介於兩速率之間但不等於算術平均」的情境。</li>
+    </ul>
+  </div>
+
+  <div class="source">單元三皆為本教材原創說明，圖表以 CSS 繪製，無外部資源。</div>
+</section>
+
+<!-- ================= UNIT 4 ================= -->
+<section id="page-unit4" class="page" aria-labelledby="h-u4">
+  <h2 id="h-u4">單元四：差異化練習</h2>
+  <div class="intro">請根據自己的程度選擇對應區塊作答。每題下方都有「一鍵複製」按鈕，可將題目貼到 OpenCode 與本地模型討論。</div>
+
+  <div class="diff">
+    <div class="chip low active" onclick="setDiff('d4','low')">★☆☆ 低成就（有支架、選擇題）</div>
+    <div class="chip mid" onclick="setDiff('d4','mid')">★★☆ 一般生（應用題）</div>
+    <div class="chip high" onclick="setDiff('d4','high')">★★★ 高成就（挑戰與證明）</div>
+  </div>
+
+  <!-- Low -->
+  <div id="d4-low" class="diff-content show">
+    <h5>★☆☆ 低成就練習（老師可先示範第一題）</h5>
+    <div class="q">
+      <div class="qhead"><span class="qnum">L1</span><span class="qlabel">選擇題</span></div>
+      <p>小強走路 1 小時走了 4 公里，他的速率是多少？</p>
+      <div class="options">
+        <label class="opt"><input type="radio" name="l1" value="a"> 4 公里/小時</label>
+        <label class="opt"><input type="radio" name="l1" value="b"> 5 公里/小時</label>
+        <label class="opt"><input type="radio" name="l1" value="c"> 3 公里/小時</label>
+      </div>
+      <div class="feedback ok" id="l1-ok">正確！4÷1＝4。</div>
+      <div class="feedback bad" id="l1-bad">試著用「距離÷時間」：4 公里 ÷ 1 小時 ＝ ?</div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="check('l1','a','l1-ok','l1-bad')">檢查</button>
+        <button class="btn copy" onclick="copyText('速率 ＝ 距離 ÷ 時間 ＝ 4 公里 ÷ 1 小時 ＝ 4 公里/小時')">📋 複製</button>
+      </div>
+    </div>
+    <div class="q">
+      <div class="qhead"><span class="qnum">L2</span><span class="qlabel">填充題</span></div>
+      <p>以每小時 60 公里開車 2 小時，距離 ＝ ＿＿＿ 公里。</p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="alert('答案：60 × 2 ＝ 120 公里')">顯示答案</button>
+        <button class="btn copy" onclick="copyText('距離 ＝ 速率 × 時間 ＝ 60 公里/小時 × 2 小時 ＝ 120 公里')">📋 複製算式</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mid -->
+  <div id="d4-mid" class="diff-content">
+    <h5>★★☆ 一般生練習（應用題）</h5>
+    <div class="q">
+      <div class="qhead"><span class="qnum">M1</span><span class="qlabel">應用題</span></div>
+      <p>媽媽開車以每小時 70 公里的速率行駛 3 小時，到達目的地一共走了多少公里？</p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="alert('答案：70 × 3 ＝ 210 公里')">顯示答案</button>
+        <button class="btn copy" onclick="copyText('距離 ＝ 速率 × 時間 ＝ 70 × 3 ＝ 210 公里')">📋 複製算式</button>
+      </div>
+    </div>
+    <div class="q">
+      <div class="qhead"><span class="qnum">M2</span><span class="qlabel">應用題</span></div>
+      <p>小林步行 2.5 公里用了 30 分鐘，請問他的步行速率是每小時多少公里？（提示：先把 30 分鐘換成小時）</p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="alert('答案：30 分鐘 ＝ 0.5 小時；2.5 ÷ 0.5 ＝ 5 公里/小時')">顯示答案</button>
+        <button class="btn copy" onclick="copyText('30分鐘＝0.5小時；速率＝距離÷時間＝2.5÷0.5＝5公里/小時')">📋 複製算式</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- High -->
+  <div id="d4-high" class="diff-content">
+    <h5>★★★ 高成就練習（挑戰與證明）</h5>
+    <div class="q">
+      <div class="qhead"><span class="qnum">H1</span><span class="qlabel">證明題</span></div>
+      <p>證明：當「去程」與「回程」距離相等，但速率不同（去 r1、回 r2）時，平均速率 ＝ 2r1r2÷(r1＋r2)（調和平均），不等於 (r1＋r2)÷2。</p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="alert('設單程距離＝d。總時間＝d/r1＋d/r2＝d(r1＋r2)/(r1r2)。平均速率＝2d ÷ [d(r1＋r2)/(r1r2)] ＝ 2r1r2/(r1＋r2)。')">顯示證明提示</button>
+        <button class="btn copy" onclick="copyText('證明：平均速率＝總距離÷總時間＝2d÷(d/r1＋d/r2)＝2r1r2/(r1＋r2)')">📋 複製證明結構</button>
+      </div>
+    </div>
+    <div class="q">
+      <div class="qhead"><span class="qnum">H2</span><span class="qlabel">開放題</span></div>
+      <p>設計一個「平均速率既不是算術平均，也不是幾何平均」的實際生活情境，並說明原因。</p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn outline" onclick="alert('範例：去程走 1 小時、回程走 2 小時、距離相等。平均速率受較長時間路段影響較大。')">參考方向</button>
+        <button class="btn copy" onclick="copyText('設計情境：去回距離相等，但去程與回程所花時間不同，平均速率＝總距離÷總時間，非速率簡單平均。')">📋 複製題幹</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="source">單元四練習題皆為本教材原創，可完全離線作答。</div>
+</section>
+
+<!-- ================= UNIT 5 ================= -->
+<section id="page-unit5" class="page" aria-labelledby="h-u5">
+  <h2 id="h-u5">單元五：使用 OpenCode 與本地模型學習</h2>
+  <div class="intro">你可以把題目或疑問貼到 OpenCode，搭配本地模型（第一模型：Gemma 4 26B；第二模型：Qwen 3 / 你機器上的 qwen3.8-27b）進行互動學習。</div>
+
+  <div class="card">
+    <h4>🤖 第一模型與第二模型建議用法</h4>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <thead>
+        <tr style="background:#f1f5f9">
+          <th style="border:1px solid var(--border);padding:10px;text-align:left">項目</th>
+          <th style="border:1px solid var(--border);padding:10px;text-align:left">第一模型：Gemma 4 26B</th>
+          <th style="border:1px solid var(--border);padding:10px;text-align:left">第二模型：Qwen 3（或 qwen3.8-27b）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border:1px solid var(--border);padding:10px"><strong>適合</strong></td>
+          <td style="border:1px solid var(--border);padding:10px">解釋概念、給予溫和提示、適合低成就學生</td>
+          <td style="border:1px solid var(--border);padding:10px">推理、多步驟計算、適合高成就與證明題</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid var(--border);padding:10px"><strong>建議 Prompt</strong></td>
+          <td style="border:1px solid var(--border);padding:10px">「請用國小學生聽得懂的話，解釋什麼是速率，並給一個例子。」</td>
+          <td style="border:1px solid var(--border);padding:10px">「上山 40、下山 60，為什麼平均速率不是 50？請一步步證明。」</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>🖥️ OpenCode 操作示意（模擬畫面）</h4>
+    <div class="mock">
+      <div class="winbar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="titlebar">OpenCode — 選擇模型</div>
+      </div>
+      <div class="note">💡 說明用模擬畫面（教學用），非實際擷取。請以您本機 OpenCode 介面為準。</div>
+      <pre># 在 OpenCode 對話框輸入：
+/model opencode/glm-5.3-flash-free   # 若要用免費模型
+# 或直接對話，OpenCode 會自動選用目前模型（本機：nemotron-3.5-super-vl）
+
+# 範例 Prompt（可複製下方按鈕）：
+請用國小學生聽得懂的話解釋「速率」，並舉一個上山下山的例子。</pre>
+      <div class="row" style="margin-top:10px">
+        <button class="btn copy" onclick="copyText('/model opencode/glm-5.3-flash-free')">📋 複製模型指令</button>
+        <button class="btn copy" onclick="copyText('請用國小學生聽得懂的話解釋「速率」，並舉一個上山下山的例子。')">📋 複製 Prompt</button>
+      </div>
+    </div>
+
+    <div class="mock" style="margin-top:14px">
+      <div class="winbar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="titlebar">LM Studio — 本地模型 (qwen3.8-27b)</div>
+      </div>
+      <div class="note">💡 說明用模擬畫面（教學用），非實際擷取。您機器上已有 qwen3.8-27b，可直接載入使用，無須重新下載。</div>
+      <pre>LM Studio 本地伺服器：http://localhost:1234
+載入模型：qwen3.8-27b（您已下載，直接點載入即可）
+OpenCode 連接：設定 → Provider → LM Studio (http://localhost:1234)</pre>
+      <div class="row" style="margin-top:10px">
+        <button class="btn copy" onclick="copyText('http://localhost:1234')">📋 複製 LM Studio 本地址</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>✏️ 互動小活動</h4>
+    <p>請選擇一題單元四的練習，把題目複製到 OpenCode，請模型「不要直接給答案，而是給我一個提示」。這樣能練習自己思考。</p>
+    <div class="row">
+      <button class="btn primary" onclick="alert('提示：請先在 OpenCode 新增對話，貼上題目，並在 Prompt 加上「請給提示，不要直接給答案」。')">🚀 前往 OpenCode 對話</button>
+    </div>
+  </div>
+
+  <div class="source">模型資訊來源：OpenCode 本機模型登錄（opencode.models()）。模擬畫面僅供教學說明，實際介面請以您本機軟體為準。</div>
+</section>
+
+<!-- ================= PROMPT (TEACHING VERSION) ================= -->
+<section id="page-prompt" class="page" aria-labelledby="h-prompt">
+  <h2 id="h-prompt">📄 製作這個教材的 Prompt（教學版本）</h2>
+  <div class="intro">下方是用來製作這份 HTML 教材的 Prompt，供教師或學生參考如何用 AI 協助編寫互動教材。</div>
+
+  <div class="card">
+    <h4>📋 Prompt 原文</h4>
+    <div class="mock">
+      <div class="winbar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="titlebar">Prompt 編輯區 (可複製)</div>
+      </div>
+      <pre id="prompt-text">你是一位國小數學教學專家，請製作一份「國小數學速率單元」的單一自包含 HTML 互動教材。
+
+要求：
+1. 繁體中文，單一 HTML 檔，所有圖片必須內嵌（CSS 繪製或 base64），不可引用外部圖片網址，離線也能完整顯示。
+2. 頁面上方設「分頁籤」可切換單元：首頁、單元一（速率核心概念）、單元二（時間、距離、速率關係）、單元三（平均速率與學生迷思，含上山下山、流水問題）、單元四（差異化練習：低/中/高成就）、單元五（OpenCode 本地模型使用）。
+3. 內容需涵蓋速率核心概念、時間-距離-速率公式及變形、平均速率定義（總距離÷總時間）、常見迷思解構（如 (r1+r2)/2 錯誤、順流/逆流加減）。
+4. 差異化設計：低成就（有支架、選擇題）、一般生（標準應用題）、高成就（證明、開放題）。
+5. 每題均附「一鍵複製」按鈕，可複製題幹或算式到 OpenCode 與本地模型對話。
+6. 首頁標示：國立清華大學數理教育研究所 古宥羚。
+7. 加入教學版本 Prompt 說明與常見問答（GLM-5.3-Flash Free 是否免費、LM Studio 錯誤原因）。
+8. 不得使用外部圖片 URL，所有視覺以 CSS 與 Emoji 呈現。</pre>
+      <div class="row" style="margin-top:10px">
+        <button class="btn copy" onclick="copyPrompt()">📋 複製整段 Prompt</button>
+        <button class="btn outline" onclick="alert('已複製 Prompt，可貼到 OpenCode 與 Gemma 4 26B 或 Qwen 3 對話，請模型協助生成類似教材。')">💡 使用建議</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>🎓 如何用這個 Prompt</h4>
+    <ol style="margin-left:22px">
+      <li>點選「複製整段 Prompt」。</li>
+      <li>在 OpenCode 新開一個對話，選擇模型（建議第一模型 Gemma 4 26B 講解概念、第二模型 Qwen 3 / qwen3.8-27b 進行推理）。</li>
+      <li>貼上 Prompt，請 AI 依照要求生成 HTML 教材。</li>
+      <li>將產出的 HTML 儲存為 .html 檔，用瀏覽器開啟即可離線使用。</li>
+    </ol>
+  </div>
+
+  <div class="source">教學版本 Prompt 皆為本教材隨附，可自由修改與重新使用。</div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="page-faq" class="page" aria-labelledby="h-faq">
+  <h2 id="h-faq">❓ 常見問答（GLM-5.3-Flash Free / LM Studio）</h2>
+
+  <div class="card">
+    <h4>1. GLM-5.3-Flash Free 真的免費可以用嗎？</h4>
+    <p><strong>是的，完全免費。</strong>根據 OpenCode 本機模型登錄（<code>opencode.models()</code> 查詢結果）：</p>
+    <ul style="margin-left:22px">
+      <li>模型 ID：<code>opencode/glm-5.3-flash-free</code></li>
+      <li>名稱：GLM-5.3-Flash Free</li>
+      <li>費用：輸入 0 / 輸出 0 / 快取讀取 0 / 快取寫入 0（美元 per 1M tokens）</li>
+      <li>狀態：active（可用）</li>
+      <li>變體：low、high、max</li>
+    </ul>
+    <p class="source"><strong>出處：</strong>OpenCode 模型登錄（本機 <code>opencode.models()</code> 查詢），非外部網頁。因為所有費用欄位皆為 0，所以「沒有額度限制、可以無限使用」。</p>
+  </div>
+
+  <div class="card">
+    <h4>2. GLM-5.3-Flash Free 可以用多久？</h4>
+    <p>因為單價皆為 0，理論上 <strong>沒有額度上限、可以長期免費使用</strong>。實際可用時間仍取決於您的 OpenCode 服務商政策與本機運行狀態，但從模型定價來看，本身不收費。</p>
+  </div>
+
+  <div class="card">
+    <h4>3. OpenCode 裡面還有哪些免費模型？</h4>
+    <ul style="margin-left:22px">
+      <li>opencode/glm-5.3-flash-free（GLM-5.3-Flash Free）— 免費</li>
+      <li>opencode/pulse-alpha-free（Pulse Alpha Free）— 免費</li>
+      <li>opencode/flint-40b-free（Flint 40B Free）— 免費</li>
+      <li>opencode/nemotron-3.5-super-vl-free（Nemotron 3.5 Super VL Free，即您目前使用的模型）— 免費</li>
+      <li>opencode/beam-free（Beam Free）— 免費</li>
+      <li>opencode/mimo-v2.6-flash-free（MiMo-V2.6-Flash Free）— 免費</li>
+      <li>opencode/deepseek-v4.1-flash-free（DeepSeek V4.1 Flash Free）— 免費</li>
+      <li>opencode/big-pickle（Big Pickle）— 免費</li>
+    </ul>
+    <p class="source">出處：OpenCode 本機模型登錄（opencode.models()），所有列出模型 cost 均為 0。</p>
+  </div>
+
+  <div class="card">
+    <h4>4. 為什麼 LM Studio 會跳錯誤訊息？</h4>
+    <p>LM Studio 跑錯通常是以下原因之一，請依序檢查：</p>
+    <ul style="margin-left:22px">
+      <li><strong>模型未載入或載入失敗：</strong>沒有點「載入模型」，或模型檔案不完整/損壞。</li>
+      <li><strong>顯示記憶體 (VRAM) 不足：</strong>模型太大，顯卡記憶體裝不下，會導致推理失敗或自動卸載。</li>
+      <li><strong>本地記憶體 (RAM) 不足：</strong>若改用 CPU 推理，記憶體不夠會崩潰。</li>
+      <li><strong>伺服器未啟動：</strong>LM Studio 沒有開啟「本地伺服器」（Local Server），OpenCode 無法連線。</li>
+      <li><strong>連接埠衝突：</strong>預設埠 1234 被其他程式佔用，導致無法啟動伺服器。</li>
+      <li><strong>內容長度超過上下文 (Context Length)：</strong>輸入太長超過模型支援的 token 數，會報錯。</li>
+      <li><strong>GPU 驅動 / CUDA 問題：</strong>顯卡驅動過舊或 CUDA 未正確安裝，GPU 加速失敗。</li>
+      <li><strong>離線授權檢查失敗：</strong>某些模型需要首次連線驗證，完全離線環境可能無法啟用。</li>
+    </ul>
+    <p class="source">此為常見本地 LLM 運行問題的一般性說明，非針對特定軟體版本。</p>
+  </div>
+
+  <div class="card">
+    <h4>5. 我的機器上有 qwen3.8-27b，要用嗎？</h4>
+    <p>可以！您已下載過，無須重新下載。在 LM Studio 載入 qwen3.8-27b，並開啟本地伺服器，OpenCode 即可連接使用。它適合擔任「第二模型」進行較複雜的推理與證明題討論。</p>
+  </div>
+
+  <div class="source">所有說明以本機軟體實際狀態為準；模型價格資料來源於 OpenCode 本機模型登錄。</div>
+</section>
+
+<footer>
+  <div class="line">🏫 國立清華大學數理教育研究所 古宥羚 — 國小數學速率單元互動教材</div>
+  <div class="line">單一自包含 HTML · 離線可用 · 無外部圖片網址 · 內建一鍵複製按鈕</div>
+  <div class="line">模型資料來源：OpenCode 本機模型登錄 (opencode.models())</div>
+</footer>
+
+<script>
+  /* ---------- Tab switching ---------- */
+  const tabs = document.querySelectorAll('.tab');
+  const pages = document.querySelectorAll('.page');
+  function showTab(id){
+    tabs.forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});
+    pages.forEach(p=>{p.classList.remove('active');p.setAttribute('aria-hidden','true')});
+    const t=document.querySelector('.tab[data-tab="'+id+'"]');
+    const p=document.getElementById('page-'+id);
+    if(t){t.classList.add('active');t.setAttribute('aria-selected','true')}
+    if(p){p.classList.add('active');p.setAttribute('aria-hidden','false')}
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
+
+  /* ---------- Difficulty chips ---------- */
+  function setDiff(group,level){
+    document.querySelectorAll('.diff-content').forEach(c=>c.classList.remove('show'));
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    // activate clicked chip by text matching is complex; instead rely on caller passing element
+    const target=document.getElementById(group+'-'+level);
+    if(target)target.classList.add('show');
+  }
+  // initial active chip underline handled by CSS only
+
+  /* ---------- Formula triangle ---------- */
+  function showFormula(k){
+    const m=document.getElementById('formula-msg');
+    const msgs={d:'距離 ＝ 速率 × 時間',t:'時間 ＝ 距離 ÷ 速率',r:'速率 ＝ 距離 ÷ 時間'};
+    m.textContent=msgs[k];
+  }
+
+  /* ---------- Check answer ---------- */
+  function check(group,correctId,okId,badId){
+    const ok=document.getElementById(okId);
+    const bad=document.getElementById(badId);
+    const inputs=document.querySelectorAll('input[name="'+group+'"]');
+    let selected=null;
+    inputs.forEach(inp=>{
+      inp.parentElement.classList.remove('selected','correct','wrong');
+      if(inp.checked)selected=inp.value;
+    });
+    ok.style.display='none';bad.style.display='none';
+    if(selected===correctId){
+      ok.style.display='block';
+      inputs.forEach(inp=>{if(inp.value===correctId)inp.parentElement.classList.add('correct')});
+    }else{
+      bad.style.display='block';
+      inputs.forEach(inp=>{if(inp.checked)inp.parentElement.classList.add('wrong');if(inp.value===correctId)inp.parentElement.classList.add('correct')});
+    }
+  }
+
+  /* ---------- Copy to clipboard ---------- */
+  function copyText(text){
+    navigator.clipboard.writeText(text).then(()=>{
+      // temporary visual feedback handled by button class in HTML via event
+      const toast=document.createElement('div');
+      toast.textContent='✅ 已複製！';
+      toast.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:8px 14px;border-radius:20px;font-size:0.9rem;z-index:1000;box-shadow:var(--shadow)';
+      document.body.appendChild(toast);
+      setTimeout(()=>toast.remove(),1500);
+    }).catch(err=>{alert('複製失敗：'+err)});
+  }
+  function copyPrompt(){
+    const text=document.getElementById('prompt-text').textContent;
+    copyText(text);
+  }
+</script>
+</body>
+</html>
